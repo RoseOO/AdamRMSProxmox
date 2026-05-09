@@ -23,13 +23,13 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/RoseOO/AdamRMSProxmox/ma
 From inside the container:
 
 ```bash
-cd /opt/adamrms && docker compose down && docker compose pull && docker compose up -d
+update_adamrms
 ```
 
 Or from the Proxmox host:
 
 ```bash
-pct exec <CTID> -- bash -c "cd /opt/adamrms && docker compose down && docker compose pull && docker compose up -d"
+pct exec <CTID> -- update_adamrms
 ```
 
 ## Default Resources

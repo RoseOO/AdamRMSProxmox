@@ -195,6 +195,50 @@ msg_info "Updating system"
 apt-get update -qq && apt-get upgrade -y -qq
 msg_ok "System updated"
 
+msg_info "Setting up root auto-login"
+mkdir -p /etc/systemd/system/container-getty@.service.d
+cat > /etc/systemd/system/container-getty@.service.d/override.conf <<'AUTOLOGIN'
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin root --noclear %I $TERM
+AUTOLOGIN
+systemctl daemon-reload
+msg_ok "Root auto-login configured"
+
+msg_info "Setting up MOTD"
+cat > /etc/motd <<'MOTD'
+\033[1;32m
+   █████╗ ██████╗  █████╗ ███╗   ███╗██████╗ ███╗   ███╗███████╗
+  ██╔══██╗██╔══██╗██╔══██╗████╗ ████║██╔══██╗████╗ ████║██╔════╝
+  ███████║██║  ██║███████║██╔████╔██║██████╔╝██╔████╔██║███████╗
+  ██╔══██║██║  ██║██╔══██║██║╚██╔╝██║██╔══██╗██║╚██╔╝██║╚════██║
+  ██║  ██║██████╔╝██║  ██║██║ ╚═╝ ██║██║  ██║██║ ╚═╝ ██║███████║
+  ╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝
+\033[0m
+
+  Asset & Rental Management System
+
+  \033[1;33mType 'update_adamrms' to update AdamRMS\033[0m
+  \033[1;33mCredentials saved to ~/adamrms.creds\033[0m
+MOTD
+touch /root/.hushlogin
+msg_ok "MOTD configured"
+
+msg_info "Creating update command"
+cat > /usr/local/bin/update_adamrms <<'UPDATE'
+#!/usr/bin/env bash
+set -e
+echo -e "\033[1;32m[INFO]\033[0m  Updating AdamRMS..."
+cd /opt/adamrms
+docker compose down
+docker compose pull
+docker compose up -d
+echo -e "\033[0;32m[ OK ]\033[0m  AdamRMS updated successfully!"
+UPDATE
+chmod +x /usr/local/bin/update_adamrms
+ln -sf /usr/local/bin/update_adamrms /usr/local/bin/update 2>/dev/null || true
+msg_ok "Update command created"
+
 msg_info "Installing Docker"
 apt-get install -y -qq curl ca-certificates gnupg lsb-release openssl
 install -m 0755 -d /etc/apt/keyrings
@@ -343,7 +387,8 @@ echo -e "  URL           : ${BGN}http://${CT_IP}${CL}"
 echo -e "  Default Login : username / password!"
 echo -e "  Credentials   : ~/adamrms.creds (inside container)"
 echo ""
-echo -e "  ${YW}Update:${CL} pct exec ${CT_ID} -- bash -c \"cd /opt/adamrms && docker compose down && docker compose pull && docker compose up -d\""
+echo -e "  ${YW}Update:${CL}  Run 'update_adamrms' inside the container, or:"
+echo -e "        pct exec ${CT_ID} -- update_adamrms"
 echo -e "${GN}═══════════════════════════════════════════════${CL}"
 
 rm -f "$INSTALL_SCRIPT"
