@@ -18,7 +18,7 @@ Creates a Debian 13 LXC container and installs AdamRMS with a database backend i
 Run in your Proxmox VE shell:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/YOUR_USER/adamrms-proxmox/main/ct/adamrms.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/RoseOO/AdamRMSProxmox/main/ct/adamrms.sh)"
 ```
 
 ### Update
@@ -32,7 +32,7 @@ update_script
 Or via the Proxmox shell:
 
 ```bash
-pct exec <CTID> -- bash -c "$(curl -fsSL https://raw.githubusercontent.com/YOUR_USER/adamrms-proxmox/main/install/adamrms-install.sh)"
+pct exec <CTID> -- bash -c "$(curl -fsSL https://raw.githubusercontent.com/RoseOO/AdamRMSProxmox/main/install/adamrms-install.sh)"
 ```
 
 ## Default Resources
