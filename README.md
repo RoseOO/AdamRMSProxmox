@@ -1,38 +1,35 @@
 # AdamRMS Proxmox VE Installer
 
-One-command installer for [AdamRMS](https://adam-rms.com) on Proxmox VE, built in the style of [community-scripts/ProxmoxVE](https://github.com/community-scripts/ProxmoxVE).
-
-## What it does
-
-Creates a Debian 13 LXC container and installs AdamRMS with a database backend inside Docker:
-
-- AdamRMS (ghcr.io/adam-rms/adam-rms:latest)
-- MariaDB or MySQL (you choose during install)
-- Docker + Docker Compose v2
-- Automatic database creation and health checking
+One-command installer for [AdamRMS](https://adam-rms.com) on Proxmox VE.
 
 ## Usage
-
-### Fresh Install
 
 Run in your Proxmox VE shell:
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/RoseOO/AdamRMSProxmox/main/ct/adamrms.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/RoseOO/AdamRMSProxmox/main/adamrms.sh)"
 ```
 
-### Update
+## What it does
 
-From inside the LXC container, run:
+- Creates a Debian 13 LXC container
+- Installs Docker + Docker Compose v2
+- Prompts for MariaDB or MySQL database backend
+- Deploys AdamRMS via docker-compose with health checks
+- Generates secure random database credentials
+
+## Update
+
+From inside the container:
 
 ```bash
-update_script
+cd /opt/adamrms && docker compose down && docker compose pull && docker compose up -d
 ```
 
-Or via the Proxmox shell:
+Or from the Proxmox host:
 
 ```bash
-pct exec <CTID> -- bash -c "$(curl -fsSL https://raw.githubusercontent.com/RoseOO/AdamRMSProxmox/main/install/adamrms-install.sh)"
+pct exec <CTID> -- bash -c "cd /opt/adamrms && docker compose down && docker compose pull && docker compose up -d"
 ```
 
 ## Default Resources
@@ -42,22 +39,14 @@ pct exec <CTID> -- bash -c "$(curl -fsSL https://raw.githubusercontent.com/RoseO
 | CPU | 2 cores |
 | RAM | 2048 MB |
 | Disk | 10 GB |
-| OS | Debian 13 |
 
 ## Post-Install
 
 - Access AdamRMS at `http://<container-ip>`
 - Default login: `username` / `password!`
 - **Change the default password immediately**
-- Database credentials are stored in `~/adamrms.creds`
-
-## Database
-
-Choose between MariaDB (LTS) or MySQL 8.0 during installation. Both are configured with:
-- Automatic database creation
-- Persistent volume (`adamrms_db_data`)
-- Health checks before AdamRMS starts
+- Database credentials: `~/adamrms.creds` inside the container
 
 ## License
 
-MIT - see LICENSE
+MIT
